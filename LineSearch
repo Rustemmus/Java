@@ -1,0 +1,18 @@
+class LineSearch {
+    public static void main(String[] args)
+//creating an array
+    {
+        int len = 15, i, k, key = 8;
+        int[] ar = new int[len];
+
+        for (i = 0; i < len; i++) {
+            ar[i] = i;
+        }
+        // Searching 8 in the array
+        for (k = 0; k < len; k++)
+            if (k == key) {
+                System.out.println("found at index "+ar[k]);
+                break;
+            }
+    }
+}
