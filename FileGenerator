@@ -1,0 +1,104 @@
+/*
+1) Creating a file with user defined size.
+2) Input random bytes into file
+3) Sort bytes. acbn -> nbca
+*/
+package com.company;
+
+import java.io.*;
+import java.util.Random;
+
+public class Main {
+    private static String filePath = "C:\\Projects\\FileGen";
+    private static String fileName = "tmp.txt";
+    private static int memoryResourceAvailable = 1024 * 1024; //bytes
+
+    private static final String ENTER_MESSAGE_RUS = "Введите размер файла в байтах";
+    //private static final String INCORRECT_LENGTH_MESSAGE_RUS = "Введен не корректный размер файла";
+    //private static final String FAILED_CREATING_MESSAGE_RUS = "Не удалось создать Файл %s\\%s";
+
+    public static void main(String[] args) {
+        try {
+            int fileLength = getFileLength();
+            generateFile(filePath, fileName, fileLength);
+            printFile(filePath, fileName);
+            resortFile(filePath, fileName);
+            printFile(filePath, fileName);
+        } catch (Exception e) {
+            System.out.println("Something gone wrong: " + e.getLocalizedMessage());
+        }
+    }
+
+    private static void generateFile(String filePath, String fileName, int fileLength) throws IOException, NumberFormatException {
+
+        String successReportRus = "Файл " + filePath + "\\" + fileName + " размером " + fileLength + " байт успешно создан";
+
+        try {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(filePath + "\\" + fileName, "rw");
+            Random random = new Random();
+            int iterationCount = fileLength / memoryResourceAvailable;
+            int part = memoryResourceAvailable;
+            int part2 = fileLength % memoryResourceAvailable;
+            randomAccessFile.setLength(iterationCount * part + part2);
+
+            for (long i = 0; i < iterationCount; i++) {
+                byte[] b = new byte[part];
+                random.nextBytes(b);
+                randomAccessFile.write(b);
+            }
+            byte[] b = new byte[part2];
+            random.nextBytes(b);
+            randomAccessFile.write(b);
+            randomAccessFile.close();
+            System.out.println(successReportRus);
+
+
+        } catch (Exception e) {
+            //System.out.println(String.format(FAILED_CREATING_MESSAGE_RUS, filePath, fileName));
+            //System.out.println(INCORRECT_LENGTH_MESSAGE_RUS);
+            System.out.println(e);
+
+        }
+    }
+
+    private static int getFileLength() throws IOException, NumberFormatException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println(ENTER_MESSAGE_RUS);
+        return Integer.parseInt(bufferedReader.readLine());
+    }
+
+    private static void printFile(String filePath, String fileName) {
+        try {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(filePath + "\\" + fileName, "rw");
+            randomAccessFile.seek(0);
+            byte[] arr = new byte[(int) randomAccessFile.length()];
+            randomAccessFile.readFully(arr);
+            String f = new String(arr);
+            System.out.println(f);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    private static void resortFile(String filePath, String fileName) throws IOException, NumberFormatException {
+        try {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(filePath + "\\" + fileName, "rw");
+            randomAccessFile.seek(0);
+            byte[] arr = new byte[(int) randomAccessFile.length()];
+            randomAccessFile.readFully(arr);
+            //delete old data by writing new blank string
+            randomAccessFile.seek(0);
+            randomAccessFile.writeBytes(new String());
+            //write new data
+            for (int p = (int) randomAccessFile.length() - 1; p >= 0; p--) {
+                randomAccessFile.write(arr[p]);
+            }
+            randomAccessFile.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+
+        }
+    }
+
+}
